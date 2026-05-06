@@ -1,0 +1,8 @@
+node_modules/
+dist/
+*.sqlite
+*.db
+*.log
+sentry.bin
+*.machine
+config.yaml

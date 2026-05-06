@@ -1,0 +1,47 @@
+{
+  "name": "@tursom/turntf-steam-bridge",
+  "version": "0.1.0",
+  "description": "Steam chat bridge for turntf.",
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/tursom/turntf-steam-bridge.git"
+  },
+  "license": "MIT",
+  "type": "module",
+  "main": "./dist/index.cjs",
+  "module": "./dist/index.mjs",
+  "types": "./dist/index.d.ts",
+  "exports": {
+    ".": {
+      "types": "./dist/index.d.ts",
+      "import": "./dist/index.mjs",
+      "require": "./dist/index.cjs"
+    }
+  },
+  "files": [
+    "dist",
+    "configs"
+  ],
+  "scripts": {
+    "build": "tsup",
+    "typecheck": "tsc --noEmit",
+    "start": "node dist/index.mjs"
+  },
+  "dependencies": {
+    "@tursom/turntf-js": "file:../../sdk/turntf-js",
+    "better-sqlite3": "^11.7.0",
+    "steam-user": "^5.0.8",
+    "steamcommunity": "^3.48.2",
+    "winston": "^3.12.0",
+    "yaml": "^2.6.1"
+  },
+  "devDependencies": {
+    "@types/better-sqlite3": "^7.6.12",
+    "@types/node": "^22.0.0",
+    "@types/steam-user": "^5.1.0",
+    "@types/steamcommunity": "^3.43.0",
+    "@types/ws": "^8.5.0",
+    "tsup": "^8.3.5",
+    "typescript": "^5.6.0"
+  }
+}

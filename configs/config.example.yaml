@@ -1,0 +1,20 @@
+storage:
+  sqlite_path: "./steam-bridge.sqlite"
+
+turntf:
+  base_url: "http://127.0.0.1:8080"
+  bridge_user:
+    node_id: 4096
+    user_id: 1201
+    password:
+      source: plain
+      value: bridge-password
+
+backend:
+  steam:
+    account_name: ""
+    password: ""
+    sentry_path: "./sentry.bin"
+    logon_id: 0
+    # auth_code: ""    # Steam Guard 验证码
+    # proxy: ""        # SOCKS5 代理
