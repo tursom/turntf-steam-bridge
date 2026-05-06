@@ -28,7 +28,7 @@
     "start": "node dist/index.mjs"
   },
   "dependencies": {
-    "@tursom/turntf-js": "file:../../sdk/turntf-js",
+    "@tursom/turntf-js": "^0.1.0",
     "better-sqlite3": "^11.7.0",
     "steam-user": "^5.0.8",
     "steamcommunity": "^3.48.2",
