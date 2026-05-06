@@ -86,9 +86,6 @@ function normalizeAndValidateConversationRef(ref: ConversationRef): void {
   if (!ref.platform) {
     ref.platform = "steam";
   }
-  if (ref.platform !== "steam") {
-    throw new Error(`unsupported conversation_ref.platform "${ref.platform}"`);
-  }
   if (ref.scene !== "private") {
     throw new Error(`unsupported conversation_ref.scene "${ref.scene}"`);
   }
@@ -141,6 +138,24 @@ function conversationKey(ref: ConversationRef): string {
   return [ref.platform, ref.scene, ref.chat_id, threadID].join("|");
 }
 
+function conversationMatches(
+  ref: ConversationRef,
+  pattern: ConversationRef,
+): boolean {
+  if (ref.platform !== pattern.platform) return false;
+  if (ref.scene !== pattern.scene) return false;
+  if (pattern.chat_id && ref.chat_id !== pattern.chat_id) return false;
+  if (pattern.thread_id && ref.thread_id !== pattern.thread_id) return false;
+  return true;
+}
+
+function withConversation(
+  env: BridgeEnvelope,
+  conv: ConversationRef,
+): BridgeEnvelope {
+  return { ...env, conversation_ref: conv };
+}
+
 function textSummary(content: Content): string {
   return content.segments
     .filter((s) => s.kind === "text")
@@ -176,10 +191,12 @@ function parseEnvelope(data: Uint8Array): BridgeEnvelope {
 export {
   ENVELOPE_VERSION,
   conversationKey,
+  conversationMatches,
   newReceiptEnvelope,
   normalizeAndValidateEnvelope,
   parseEnvelope,
   textSummary,
+  withConversation,
 };
 export type {
   BridgeEnvelope,

@@ -39,7 +39,7 @@ export class Runtime extends NopHandler {
     const bridgeUserId = String(cfg.turntf.bridge_user.user_id);
     this.bridgeUser = { nodeId: bridgeNodeId, userId: bridgeUserId };
 
-    this.store = new Store(cfg.storage.sqlite_path, this.bridgeUser);
+    this.store = new Store(cfg.storage.sqlite_path, this.bridgeUser, cfg.relay);
 
     this.gateway = createSteamGateway(
       {

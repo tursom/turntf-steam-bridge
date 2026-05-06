@@ -38,6 +38,28 @@ interface Config {
   storage: StorageConfig;
   turntf: TurnTFConfig;
   backend: BackendConfig;
+  relay?: RelayConfig;
+}
+
+interface RelayConfig {
+  peer_bridges?: PeerBridgeConfig[];
+}
+
+interface PeerBridgeConfig {
+  peer_node_id: number;
+  peer_user_id: number;
+  from_conversation: {
+    platform: string;
+    scene: "private";
+    chat_id: string;
+    thread_id?: string;
+  };
+  to_conversation: {
+    platform: string;
+    scene: "private";
+    chat_id: string;
+    thread_id?: string;
+  };
 }
 
 const defaultSentryPath = "sentry.bin";
@@ -98,4 +120,4 @@ function validateConfig(cfg: Config): void {
 }
 
 export { loadConfig };
-export type { BridgeUserConfig, Config, SteamConfig, StorageConfig, TurnTFConfig };
+export type { BridgeUserConfig, Config, PeerBridgeConfig, RelayConfig, SteamConfig, StorageConfig, TurnTFConfig };

@@ -2,13 +2,15 @@ import Database from "better-sqlite3";
 import { mkdirSync } from "node:fs";
 import { dirname } from "node:path";
 import type { MessageCursor } from "@tursom/turntf-js";
-import type {
-  BridgeEnvelope,
-  ConversationRef,
-  MessageRef,
-  ReceiptCode,
+import type { BridgeEnvelope, ConversationRef, MessageRef, ReceiptCode } from "./model.js";
+import {
+  conversationKey,
+  newReceiptEnvelope,
+  parseEnvelope,
+  conversationMatches,
+  withConversation,
 } from "./model.js";
-import { conversationKey, newReceiptEnvelope, parseEnvelope } from "./model.js";
+import type { RelayConfig } from "./config.js";
 
 const JOB_STATUS_PENDING = "pending";
 const JOB_STATUS_PROCESSING = "processing";
@@ -69,8 +71,9 @@ function fallbackReceiptConversation(): ConversationRef {
 export class Store {
   private db: Database.Database;
   private bridgeUser: BridgeUserRef;
+  private relayCfg: RelayConfig | undefined;
 
-  constructor(path: string, bridgeUser: BridgeUserRef) {
+  constructor(path: string, bridgeUser: BridgeUserRef, relayCfg?: RelayConfig) {
     if (!path.trim()) {
       throw new Error("sqlite path is required");
     }
@@ -79,6 +82,7 @@ export class Store {
     }
     this.db = new Database(path);
     this.bridgeUser = bridgeUser;
+    this.relayCfg = relayCfg;
     this.db.pragma("busy_timeout = 5000");
     this.db.pragma("journal_mode = WAL");
     this.initTables();
@@ -340,6 +344,19 @@ export class Store {
       for (const binding of bindings) {
         const jobKey = `inbound:${inboundEventId}:${binding.nodeId}:${binding.userId}`;
         this.enqueueTurnTfDelivery(jobKey, "inbound", binding, event.envelope);
+      }
+
+      if (this.relayCfg?.peer_bridges) {
+        for (let pi = 0; pi < this.relayCfg.peer_bridges.length; pi++) {
+          const peer = this.relayCfg.peer_bridges[pi]!;
+          if (!conversationMatches(event.envelope.conversation_ref, peer.from_conversation)) {
+            continue;
+          }
+          const relayEnv = withConversation(event.envelope, peer.to_conversation);
+          const jobKey = `relay:${inboundEventId}:${pi}:${peer.peer_node_id}:${peer.peer_user_id}`;
+          const target = { nodeId: String(peer.peer_node_id), userId: String(peer.peer_user_id) };
+          this.enqueueTurnTfDelivery(jobKey, "relay", target, relayEnv);
+        }
       }
       this.db
         .prepare(`UPDATE inbound_events SET status = ?, updated_at_ms = ? WHERE id = ?`)
