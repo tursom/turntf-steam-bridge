@@ -2,9 +2,11 @@ FROM node:22-alpine AS builder
 
 WORKDIR /src
 
-COPY package.json package-lock.json ./
+COPY vendor/turntf-js ./vendor/turntf-js
+COPY package.json ./
 
-RUN npm ci
+RUN node -e "const fs=require('fs');const p=JSON.parse(fs.readFileSync('package.json','utf8'));p.dependencies['@tursom/turntf-js']='file:./vendor/turntf-js';fs.writeFileSync('package.json',JSON.stringify(p,null,2))" \
+    && npm install
 
 COPY tsconfig.json tsup.config.ts ./
 COPY src/ ./src/
