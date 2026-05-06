@@ -31,7 +31,7 @@ jobs:
       - name: Vendor turntf-js SDK
         run: |
           git clone --depth 1 https://github.com/tursom/turntf-js.git _sdk
-          cd _sdk && npm install --omit=dev && npm run build && cd ..
+          cd _sdk && npm install && npm run build && cd ..
           mkdir -p vendor/turntf-js
           cp -r _sdk/dist   vendor/turntf-js/
           cp -r _sdk/proto  vendor/turntf-js/
